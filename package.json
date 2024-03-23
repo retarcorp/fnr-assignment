@@ -1,0 +1,17 @@
+{
+  "name": "fnr-assignment",
+  "version": "1.0.0",
+  "description": "Simple graphql http server for managing products database ",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Denis Latushkin (capt.osmant@proton.me)",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^20.11.30",
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3"
+  }
+}
