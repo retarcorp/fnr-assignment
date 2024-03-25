@@ -11,11 +11,22 @@ type Product {
     name: String!
     producerId: String!
     producer: Producer
+}
 
+input CreateProductParams {
+    name: String!
+    producerId: String!
+    vintage: String
 }
 
 type Query {
     getProducts: [Product]
     getProductById(productId: String): Product
     getProductsByProducer(producerId: String!): [Product]
+}
+
+type Mutation {
+    addProduct(params: [CreateProductParams]!): [Product]
+    updateProduct(productId: String!, name: String, vintage: String, producerId: String): Product
+    deleteProduct(productIds: [String]!): [Boolean]
 }

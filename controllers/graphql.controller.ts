@@ -1,4 +1,4 @@
-import http, { ServerResponse } from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 import { GraphqlResolverMongoServiceImpl } from '../resolvers/graphql.resolver';
 import { buildSchema, graphql } from 'graphql';
 import { readFileSync } from 'fs';
@@ -10,7 +10,7 @@ export default class GraphQLController {
         this.schema = buildSchema(readFileSync('./schema/types.gql').toString());
     }
 
-    fetchBody(req: http.IncomingMessage): Promise<string> {
+    fetchBody(req: IncomingMessage): Promise<string> {
         // Todo extract to a separate file
         return new Promise((resolve, reject) => {
             let body = '';
@@ -26,7 +26,7 @@ export default class GraphQLController {
         });
     }
 
-    async exec(req: http.IncomingMessage, res: http.ServerResponse): Promise<http.ServerResponse> {
+    async exec(req: IncomingMessage, res: ServerResponse): Promise<ServerResponse> {
 
         try {
             const body = JSON.parse(await this.fetchBody(req));
@@ -39,7 +39,6 @@ export default class GraphQLController {
                 rootValue: resolver,
                 variableValues: variables
             })
-
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(result));
