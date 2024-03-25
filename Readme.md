@@ -5,8 +5,8 @@
 + Set up github repo
 + Install node, ts, server dep, npm init
 + create http server and graphql endpoint
-- encapsulate controller, service, model logic + mock implementation for CRUD requests and service method CRUD = create, read, update, delete 
-- native parser for gql queries and mutations, map parsed operations to service methods
++ encapsulate controller, service, model logic + mock implementation for CRUD requests and service method CRUD = create, read, update, delete 
++ native parser for gql queries and mutations, map parsed operations to service methods
 - install mongodb ORM
 - implement model actions with orm; link service methods with ORM actions, (?) remove model class
 

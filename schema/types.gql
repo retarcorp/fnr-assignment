@@ -1,0 +1,21 @@
+type Producer {
+    _id: String
+    name: String
+    country: String
+    region: String
+}
+
+type Product {
+    _id: String!
+    vintage: String
+    name: String!
+    producerId: String!
+    producer: Producer
+
+}
+
+type Query {
+    getProducts: [Product]
+    getProductById(productId: String): Product
+    getProductsByProducer(producerId: String!): [Product]
+}
