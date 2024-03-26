@@ -1,12 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { GraphqlResolverMongoServiceImpl } from '../resolvers/graphql.resolver';
+import { GraphqlResolver, GraphqlResolverMongoServiceImpl } from '../resolvers/graphql.resolver';
 import { buildSchema, graphql } from 'graphql';
 import { readFileSync } from 'fs';
 
 export default class GraphQLController {
     schema: any;
+    resolver: GraphqlResolver;
 
-    constructor() {
+    constructor(resolver: GraphqlResolver) {
+        this.resolver = resolver;
         this.schema = buildSchema(readFileSync('./schema/types.gql').toString());
     }
 
@@ -32,11 +34,10 @@ export default class GraphQLController {
             const body = JSON.parse(await this.fetchBody(req));
             const { variables, query } = body;
 
-            const resolver = new GraphqlResolverMongoServiceImpl();
             const result = await graphql({
                 schema: this.schema,
                 source: query,
-                rootValue: resolver,
+                rootValue: this.resolver,
                 variableValues: variables
             })
 

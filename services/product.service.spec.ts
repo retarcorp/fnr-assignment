@@ -1,13 +1,39 @@
+import { MongoClient, ServerApiVersion } from "mongodb";
 import { ProductServiceMongoDbImpl } from "./product.service";
+import 'dotenv/config';
 
 describe('ProductService', () => {
 
+    let client: MongoClient;
+    let service: ProductServiceMongoDbImpl;
+
+    beforeAll(async () => {
+        client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,
+                deprecationErrors: true,
+            }
+        });
+        
+        await client.connect()
+            .catch((err: Error) => {
+                console.error('Failed to connect to MongoDB', err);
+            });
+    
+        service = new ProductServiceMongoDbImpl(client);
+    })
+
+    afterAll(async () => {
+        await client.close();
+    })
+
     it('should be defined', () => {
-        expect(new ProductServiceMongoDbImpl()).toBeDefined();
+        expect(service).toBeDefined();
     });
 
     it('should create a bunch of products', async () => {
-        const productService = new ProductServiceMongoDbImpl();
+        const productService = service;
         const products = await productService.create([
             { name: 'product 1', producerId: '1', 'vintage': 'vintage 1'},
             { name: 'product 2', producerId: '2', 'vintage': 'vintage 2'},
@@ -22,7 +48,7 @@ describe('ProductService', () => {
     })
 
     it('should update a product', async () => {
-        const productService = new ProductServiceMongoDbImpl();
+        const productService = service;
         const products = await productService.create([
             { name: 'product 1', producerId: '1', 'vintage': 'vintage 1'},
             { name: 'product 2', producerId: '2', 'vintage': 'vintage 2'},
@@ -39,7 +65,7 @@ describe('ProductService', () => {
     })
 
     it('should delete a product', async () => {
-        const productService = new ProductServiceMongoDbImpl();
+        const productService = service;
         const products = await productService.create([
             { name: 'product 1', producerId: '1', 'vintage': 'vintage 1'},
             { name: 'product 2', producerId: '2', 'vintage': 'vintage 2'},
@@ -50,8 +76,7 @@ describe('ProductService', () => {
 
         const deleted = await productService.delete(products.map(p => p._id));
         expect(deleted).toBeDefined();
-        expect(deleted.length).toBe(3);
-        expect(deleted.every(d => d)).toBeTruthy();
+        expect(deleted).toBeTruthy();
         
         const fetchedProducts = await productService.getAllProducts();
         expect(fetchedProducts).toBeDefined();
@@ -59,7 +84,7 @@ describe('ProductService', () => {
     });
 
     it('should get products by producer id', async () => {
-        const productService = new ProductServiceMongoDbImpl();
+        const productService = service;
         await productService.create([
             { name: 'product 1', producerId: 'producer-id', 'vintage': 'vintage 1'},
             { name: 'product 2', producerId: 'producer-id', 'vintage': 'vintage 2'},

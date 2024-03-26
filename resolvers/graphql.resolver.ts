@@ -14,8 +14,8 @@ export interface GraphqlResolver {
 }
 export class GraphqlResolverMongoServiceImpl implements GraphqlResolver {
     productService: ProductService;
-    constructor() {
-        this.productService = new ProductServiceMongoDbImpl();
+    constructor(productService: ProductService) {
+        this.productService = productService;
     }
 
     async getProducts(): Promise<Product[]> {
