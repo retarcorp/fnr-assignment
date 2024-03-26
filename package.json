@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node index.ts",
-    "init-db": "ts-node scripts/initDb.ts",
+    "seed-db": "ts-node scripts/seedDb.ts",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "sync-products": "ts-node scripts/syncProducts.ts"
   },
   "author": "Denis Latushkin (capt.osmant@proton.me)",
   "license": "ISC",

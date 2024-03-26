@@ -29,4 +29,5 @@ type Mutation {
     addProduct(params: [CreateProductParams]!): [Product]
     updateProduct(productId: String!, name: String, vintage: String, producerId: String): Product
     deleteProducts(productIds: [String]!): Boolean
+    syncProducts: Boolean
 }

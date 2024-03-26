@@ -8,14 +8,14 @@
 + encapsulate controller, service, model logic + mock implementation for CRUD requests and service method CRUD = create, read, update, delete 
 + native parser for gql queries and mutations, map parsed operations to service methods
 + install mongodb ORM
-- implement model actions with orm; link service methods with ORM actions, (?) remove model class
++ implement model actions with orm; link service methods with ORM actions, (?) remove model class
 
 
 ## Task 2
-- Create controller and service for parser task creation, create separate service for this
++ Create controller and service for parser task creation, create separate service for this
 - Add state lock, optional - request queue
-- Implement stream download and ingesting
-- Logs and statistics
++ Implement stream download and ingesting
++ Logs and statistics
 
 
 - exceptions and error handling: http url/method, gql schema/operation, data validation
@@ -28,3 +28,14 @@
 - code coverage
 - readme about how to use
 + logs service encapsulation
+
+## To Do:
+
+- ETL job: state lock
+- husky on commit into main: eslint, tests
+- GQL API tests - ?
+- Postman collection JSON to export
+- Code coverage on test
+- Readme about how to install and use both tasks: install, run server, run seeds, run tests and their meaning, run ETL job
+- log service everywhere + remove console.logs
+- Refactoring & Review

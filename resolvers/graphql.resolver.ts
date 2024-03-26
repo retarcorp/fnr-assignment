@@ -41,5 +41,8 @@ export class GraphqlResolverMongoServiceImpl implements GraphqlResolver {
     async deleteProducts({ productIds }: { productIds: string[] }): Promise<boolean> {
         return this.productService.delete(productIds);
     }
+    async syncProducts(): Promise<Boolean> {
+        return this.productService.startSyncJob();
+    }
 }
 

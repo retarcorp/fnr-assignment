@@ -1,6 +1,7 @@
 import { MongoClient, ObjectId } from "mongodb";
 import { Producer, Product } from "../types";
 import logger from "../utils/logger";
+import { spawn } from "child_process";
 
 
 export interface ProductService {
@@ -10,6 +11,7 @@ export interface ProductService {
     create(products: Omit<Product, '_id' | 'producer'>[]): Promise<Product[]>;
     update(_id: string, data: Partial<Product>): Promise<Product>;
     delete(_ids: string[]): Promise<boolean>;
+    startSyncJob(): Promise<boolean>;
 }
 
 export class ProductServiceMongoDbImpl implements ProductService {
@@ -91,8 +93,20 @@ export class ProductServiceMongoDbImpl implements ProductService {
         return result.deletedCount === _ids.length;
     }
 
+    async startSyncJob(): Promise<boolean> {
+        spawn("npm", ["run", "sync-products"], { detached: true, stdio: "ignore" });
+        return true;
+    }
+
     private async producerEntryToModel(producerId: string): Promise<Producer> {
         if (!producerId) {
+            return null;
+        }
+        let objectId: ObjectId;
+        try {
+            objectId = new ObjectId(producerId);
+        } catch (e) {
+            logger.error('Unable to parse producer id. Producer ID:', producerId);
             return null;
         }
 
@@ -102,7 +116,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
 
             producer = await this.client.db(process.env.DB_NAME).collection('producers').findOne({
                 _id: {
-                    $eq: new ObjectId(producerId)
+                    $eq: objectId
                 }
             }, {});
 
