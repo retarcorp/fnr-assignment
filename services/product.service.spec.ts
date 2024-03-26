@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import { ProductServiceMongoDbImpl } from "./product.service";
 import 'dotenv/config';
 
@@ -6,6 +6,7 @@ describe('ProductService', () => {
 
     let client: MongoClient;
     let service: ProductServiceMongoDbImpl;
+    let producerId: string;
 
     beforeAll(async () => {
         client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
@@ -22,9 +23,16 @@ describe('ProductService', () => {
             });
     
         service = new ProductServiceMongoDbImpl(client);
+
+        const producers = client.db(process.env.MONGODB_DB_NAME).collection('producers');
+        const result = await producers.insertOne({ name: 'Test Producer' });
+        producerId = result.insertedId.toString();
+        console.log('Producer ID:', producerId);
     })
 
     afterAll(async () => {
+        await client.db(process.env.MONGODB_DB_NAME).collection('products').deleteMany({ producerId: { $eq: producerId }});
+        await client.db(process.env.MONGODB_DB_NAME).collection('producers').deleteOne({ _id: new ObjectId(producerId) });
         await client.close();
     })
 
@@ -35,10 +43,11 @@ describe('ProductService', () => {
     it('should create a bunch of products', async () => {
         const productService = service;
         const products = await productService.create([
-            { name: 'product 1', producerId: '1', 'vintage': 'vintage 1'},
-            { name: 'product 2', producerId: '2', 'vintage': 'vintage 2'},
-            { name: 'product 3', producerId: '3', 'vintage': 'vintage 3'}
+            { name: 'product 1', producerId, 'vintage': 'vintage 1'},
+            { name: 'product 2', producerId, 'vintage': 'vintage 2'},
+            { name: 'product 3', producerId, 'vintage': 'vintage 3'}
         ]);
+
         expect(products).toBeDefined();
         expect(products.length).toBe(3);
 
@@ -50,9 +59,9 @@ describe('ProductService', () => {
     it('should update a product', async () => {
         const productService = service;
         const products = await productService.create([
-            { name: 'product 1', producerId: '1', 'vintage': 'vintage 1'},
-            { name: 'product 2', producerId: '2', 'vintage': 'vintage 2'},
-            { name: 'product 3', producerId: '3', 'vintage': 'vintage 3'}
+            { name: 'product 1', producerId, 'vintage': 'vintage 1'},
+            { name: 'product 2', producerId, 'vintage': 'vintage 2'},
+            { name: 'product 3', producerId, 'vintage': 'vintage 3'}
         ]);
 
         const updatedProduct = await productService.update(products[0]._id, { name: 'product 1 updated'});
@@ -67,9 +76,9 @@ describe('ProductService', () => {
     it('should delete a product', async () => {
         const productService = service;
         const products = await productService.create([
-            { name: 'product 1', producerId: '1', 'vintage': 'vintage 1'},
-            { name: 'product 2', producerId: '2', 'vintage': 'vintage 2'},
-            { name: 'product 3', producerId: '3', 'vintage': 'vintage 3'}
+            { name: 'product 1', producerId, 'vintage': 'vintage 1'},
+            { name: 'product 2', producerId, 'vintage': 'vintage 2'},
+            { name: 'product 3', producerId, 'vintage': 'vintage 3'}
         ]);
 
         const dbLength = (await productService.getAllProducts()).length;
@@ -84,16 +93,18 @@ describe('ProductService', () => {
     });
 
     it('should get products by producer id', async () => {
+
         const productService = service;
         await productService.create([
-            { name: 'product 1', producerId: 'producer-id', 'vintage': 'vintage 1'},
-            { name: 'product 2', producerId: 'producer-id', 'vintage': 'vintage 2'},
-            { name: 'product 3', producerId: 'producer-id', 'vintage': 'vintage 3'}
-        ]);
+            { name: 'product 1', producerId, 'vintage': 'vintage 1'},
+            { name: 'product 2', producerId, 'vintage': 'vintage 2'},
+            { name: 'product 3', producerId, 'vintage': 'vintage 3'}
+        ]);       
 
-        const fetchedProducts = await productService.getByProducerId('producer-id');
+        const fetchedProducts = await productService.getByProducerId(producerId);
+
         expect(fetchedProducts).toBeDefined();
         expect(fetchedProducts.length).toBeGreaterThanOrEqual(3);
-        expect(fetchedProducts.every(p => p.producerId === 'producer-id')).toBeTruthy();
+        expect(fetchedProducts.every(p => p.producerId === producerId)).toBeTruthy();
     });
 });

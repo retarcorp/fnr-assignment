@@ -1,5 +1,6 @@
-import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
-import { Product } from "../types";
+import { MongoClient, ObjectId } from "mongodb";
+import { Producer, Product } from "../types";
+import logger from "../utils/logger";
 
 
 export interface ProductService {
@@ -21,20 +22,34 @@ export class ProductServiceMongoDbImpl implements ProductService {
 
     async getAllProducts(): Promise<Product[]> {
         const items = await this.client.db(process.env.DB_NAME).collection('products').find({}, {}).toArray();
-        return items as unknown as Product[];
+        return await Promise.all(items.map(item => this.productEntryToModel(item)));
     }
-    
+
     async getById(id: string): Promise<Product | null> {
         const item = await this.client.db(process.env.DB_NAME).collection('products').findOne({
             _id: {
                 $eq: new ObjectId(id)
             }
         }, {});
-        return item as unknown as Product | null;
+        return await this.productEntryToModel(item);
     }
 
     async getByProducerId(producerId: string): Promise<Product[]> {
-        throw new Error('Method not implemented.');
+        console.log(producerId);
+        const items = await this.client.db(process.env.DB_NAME).collection('products').find({
+            producerId: {
+                $eq: producerId
+            }
+        });
+        console.log({
+            producerId: {
+                $eq: producerId
+            }
+        });
+        const handled = await items.toArray();
+        console.log('Items:', handled);
+
+        return await Promise.all(handled.map(item => this.productEntryToModel(item)));
     }
 
     async create(products: Omit<Product, '_id' | 'producer'>[]): Promise<Product[]> {
@@ -44,16 +59,22 @@ export class ProductServiceMongoDbImpl implements ProductService {
     }
 
     async update(_id: string, data: Partial<Product>): Promise<Product> {
-        const item = await this.client.db(process.env.DB_NAME).collection('products').findOneAndUpdate({
+        const updateFields: Partial<Product> = Object.keys(data).reduce((acc, key) => {
+            if (data[key]) acc[key] = data[key];
+            return acc;
+        }, {});
+
+        await this.client.db(process.env.DB_NAME).collection('products').findOneAndUpdate({
             _id: {
                 $eq: new ObjectId(_id)
             }
         }, {
-            $set: data
+            $set: updateFields
         }, {
             returnDocument: 'after'
         });
-        return item as unknown as Product;
+
+        return await this.getById(_id);
     }
 
     async delete(_ids: string[]): Promise<boolean> {
@@ -61,7 +82,52 @@ export class ProductServiceMongoDbImpl implements ProductService {
             _id: {
                 $in: _ids.map(id => new ObjectId(id))
             }
+        }).catch(e => {
+            logger.error(e);
+            return {
+                deletedCount: 0
+            };
         });
         return result.deletedCount === _ids.length;
+    }
+
+    private async producerEntryToModel(producerId: string): Promise<Producer> {
+        if (!producerId) {
+            return null;
+        }
+
+
+        let producer: any;
+        try {
+
+            producer = await this.client.db(process.env.DB_NAME).collection('producers').findOne({
+                _id: {
+                    $eq: new ObjectId(producerId)
+                }
+            }, {});
+
+        } catch (e) {
+            logger.error(e);
+            logger.error('Producer ID:', producerId);
+            return null;
+        }
+
+        return {
+            _id: producer._id.toString(),
+            name: producer.name,
+            country: producer.country,
+            region: producer.region
+        };
+    }
+
+    private async productEntryToModel(entry: any): Promise<Product> {
+
+        return {
+            _id: entry._id.toString(),
+            name: entry.name,
+            vintage: entry.vintage,
+            producerId: entry.producerId,
+            producer: await this.producerEntryToModel(entry.producerId)
+        } as Product;
     }
 }

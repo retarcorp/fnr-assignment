@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node index.ts",
-    "test": "jest"
+    "init-db": "ts-node scripts/initDb.ts",
+    "test": "jest",
+    "lint": "eslint ."
   },
   "author": "Denis Latushkin (capt.osmant@proton.me)",
   "license": "ISC",
@@ -14,14 +16,18 @@
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "mongodb": "^6.5.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.3"
+    "pino": "^8.19.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.24.1",
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.12",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "jest": "^29.7.0",
-    "ts-jest": "^29.1.2"
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.3",
+    "typescript-eslint": "^7.4.0"
   }
 }
