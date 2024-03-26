@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "5843ad8a-d23d-4278-8180-c575314c5e4b",
+		"name": "Fine+Rare Assignment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6243075"
+	},
+	"item": [
+		{
+			"name": "Get All Products",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n    getProducts {\n        _id,\n        name,\n        vintage,\n        producerId,\n        producer {\n            _id,\n            name,\n            country\n        }\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Product By Id",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query ($id: String) {\n    getProductById(productId: $id ) {\n        _id,\n        name,\n        vintage,\n        producer {\n            name\n        } \n    }\n}",
+						"variables": "{\n    \"id\": \"6602bcf227c0797bb87b6466\"\n}"
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Product By Producer Id",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query ($id: String!) {\n    getProductsByProducer(producerId: $id) {\n        _id,\n        name,\n        vintage,\n        producer {\n            name\n        } \n    }\n}",
+						"variables": "{\n    \"id\": \"6602bcf227c0797bb87b6466\"\n}"
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($params: [CreateProductParams]!) {\n    addProduct(params: $params) {\n        _id,\n        name,\n        producer {\n            name,\n            country,\n            region\n        }\n    }\n}",
+						"variables": "{\n    \"params\": [\n        {\n            \"vintage\": \"Vintage\",\n            \"name\": \"Product 1\",\n            \"producerId\": \"6602bcf227c0797bb87b6466\"\n        }\n    ]\n}"
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation($productId: String!, $name: String, $vintage: String, $producerId: String) {\n    updateProduct(productId: $productId, name: $name, vintage: $vintage, producerId: $producerId) {\n        name,\n        vintage,\n        producer {\n            name\n        }\n    }\n}",
+						"variables": "{\n    \"productId\": \"6602bcf227c0797bb87b6468\",\n    \"producerId\": \"6602bcf227c0797bb87b6466\"\n}"
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a Product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($ids: [String]!) {\n    deleteProducts(productIds: $ids)\n}",
+						"variables": "{\n    \"ids\": [\"6602c46891379813ec86def6\"]\n}"
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trigger Sync",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
