@@ -27,3 +27,4 @@ Application uses remote MongoDB database (within Atlas), therefore, doesn't requ
 - test coverage: unit tests launch fails if Jest detects low code coverage. 
 - postman collection: saved as an exported JSON, but can be shared among devs as well.
 - api tests: designed as a third layer of quality assurance, though now not a part of any CI pipeline. Can be ran manually to check that from client's prospective everythin is fine, in the future can be used to run e2e tests on a staging environment. Also it's much more fun to run api tests rather than test each gql query manually from Postman.
+- logs: `pino` is used for encapsulating logs logic. Logs can be further saved to any convenient destination.

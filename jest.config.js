@@ -23,4 +23,5 @@ module.exports = {
       lines: 75,
     },
   },
+  testTimeout: 15000,
 };

@@ -1,7 +1,11 @@
-import { spec } from 'pactum';
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+import { request, spec } from 'pactum';
 import { spawnSync } from 'child_process';
 import 'dotenv/config';
 import { MongoClient, ServerApiVersion } from 'mongodb';
+
+request.setDefaultTimeout(15000)
+
 
 describe('Products GraphQL API', () => {
 
@@ -58,7 +62,7 @@ describe('Products GraphQL API', () => {
         })
             .expectStatus(200).expectHeader('content-type', 'application/json')
             .returns((ctx) => {
-                const { data } = ctx.res.json;
+                const { data } = ctx.res.json as { data: any };
                 expect(data).toBeDefined();
                 expect(data.getProducts).toBeDefined();
                 expect(data.getProducts.every(({ producer }) => producerIds.includes(producer._id))).toBeTruthy()
@@ -86,14 +90,14 @@ describe('Products GraphQL API', () => {
             .expectStatus(200)
             .expectHeader('content-type', 'application/json')
             .returns((ctx) => {
-                const { data } = ctx.res.json;
+                const { data } = ctx.res.json as { data: any };
                 expect(data).toBeDefined();
                 expect(data.getProductsByProducer).toBeDefined();
                 expect(data.getProductsByProducer.every(({ producer }) => producer._id === producerIds[0])).toBeTruthy()
             })
     }, TEST_TIMEOUT)
 
-    it('Creates a product and fetches it back', async () => { 
+    it('Creates a product and fetches it back', async () => {
         const query = `
         mutation ($params: [CreateProductParams]!) {
             addProduct(params: $params) {
@@ -113,7 +117,7 @@ describe('Products GraphQL API', () => {
             "params": [
                 {
                     "vintage": "2020",
-                    "name": "Product " + Math.round(Math.random() * 10000000 + 10**6),
+                    "name": "Product " + Math.round(Math.random() * 10000000 + 10 ** 6),
                     "producerId": producerIds[0]
                 }
             ]
@@ -122,7 +126,7 @@ describe('Products GraphQL API', () => {
             .expectStatus(200)
             .expectHeader('content-type', 'application/json')
             .returns((ctx) => {
-                const { data } = ctx.res.json;
+                const { data } = ctx.res.json as { data: any };
                 expect(data).toBeDefined();
                 expect(data.addProduct).toBeDefined();
                 expect(data.addProduct[0].name).toEqual(variables.params[0].name);
@@ -148,14 +152,14 @@ describe('Products GraphQL API', () => {
                 }
             }`
         })
-        .returns((ctx) => {
-            const { data } = ctx.res.json;
-            expect(data).toBeDefined();
-            expect(data.getProducts).toBeDefined();
-            expect(data.getProducts.length).toBeGreaterThan(0);
-            const product = data.getProducts[0];
+            .returns((ctx) => {
+                const { data } = ctx.res.json as { data: any };
+                expect(data).toBeDefined();
+                expect(data.getProducts).toBeDefined();
+                expect(data.getProducts.length).toBeGreaterThan(0);
+                const product = data.getProducts[0];
 
-            const query = `
+                const query = `
                 mutation($productId: String!, $name: String, $vintage: String, $producerId: String) {
                     updateProduct(productId: $productId, name: $name, vintage: $vintage, producerId: $producerId) {
                         name,
@@ -167,23 +171,23 @@ describe('Products GraphQL API', () => {
                 }
             `;
 
-            const variables = {
-                "productId": product._id,
-                "name": "Updated Product Name",
-            }
+                const variables = {
+                    "productId": product._id,
+                    "name": "Updated Product Name",
+                }
 
-            return spec().post(url).withJson({ query, variables })
-                .expectStatus(200)
-                .expectHeader('content-type', 'application/json')
-                .returns((ctx) => {
-                    const { data } = ctx.res.json;
-                    expect(data).toBeDefined();
-                    expect(data.updateProduct).toBeDefined();
-                    expect(data.updateProduct).toBeTruthy();
-                    expect(data.updateProduct.name).toEqual(variables.name);
+                return spec().post(url).withJson({ query, variables })
+                    .expectStatus(200)
+                    .expectHeader('content-type', 'application/json')
+                    .returns((ctx) => {
+                        const { data } = ctx.res.json as { data: any };
+                        expect(data).toBeDefined();
+                        expect(data.updateProduct).toBeDefined();
+                        expect(data.updateProduct).toBeTruthy();
+                        expect(data.updateProduct.name).toEqual(variables.name);
 
-                    return spec().post(url).withJson({
-                        query: `{
+                        return spec().post(url).withJson({
+                            query: `{
                             getProductById(productId: "${product._id}") {
                                 name,
                                 vintage,
@@ -192,15 +196,15 @@ describe('Products GraphQL API', () => {
                                 }
                             }
                         }`
-                    }).returns((ctx) => {
-                        const { data } = ctx.res.json;
-                        expect(data).toBeDefined();
-                        expect(data.getProductById).toBeDefined();
-                        expect(data.getProductById.name).toEqual(variables.name);
-                    });
-                })
+                        }).returns((ctx) => {
+                            const { data } = ctx.res.json as { data: any };
+                            expect(data).toBeDefined();
+                            expect(data.getProductById).toBeDefined();
+                            expect(data.getProductById.name).toEqual(variables.name);
+                        });
+                    })
 
-        })
+            })
     }, TEST_TIMEOUT)
 
     it('Deletes a product forever from a DB', async () => {
@@ -222,34 +226,34 @@ describe('Products GraphQL API', () => {
                 }
             }`
         })
-        .returns((ctx) => {
-            const { data } = ctx.res.json;
-            expect(data).toBeDefined();
-            expect(data.getProducts).toBeDefined();
-            expect(data.getProducts.length).toBeGreaterThan(0);
-            const ids = data.getProducts.map(({ _id }) => _id);
-            const initialCount = ids.length;
+            .returns((ctx) => {
+                const { data } = ctx.res.json as { data: any };
+                expect(data).toBeDefined();
+                expect(data.getProducts).toBeDefined();
+                expect(data.getProducts.length).toBeGreaterThan(0);
+                const ids = data.getProducts.map(({ _id }) => _id);
+                const initialCount = ids.length;
 
-            const query = `
+                const query = `
                 mutation ($ids: [String]!) {
                     deleteProducts(productIds: $ids)
                 }
             `;
-            const variables = {
-                "ids": ids.slice(0, DELETE_COUNT)
-            };
+                const variables = {
+                    "ids": ids.slice(0, DELETE_COUNT)
+                };
 
-            return spec().post(url).withJson({ query, variables })
-                .expectStatus(200)
-                .expectHeader('content-type', 'application/json')
-                .returns((ctx) => {
-                    const { data } = ctx.res.json;
-                    expect(data).toBeDefined();
-                    expect(data.deleteProducts).toBeDefined();
-                    expect(data.deleteProducts).toBeTruthy();
+                return spec().post(url).withJson({ query, variables })
+                    .expectStatus(200)
+                    .expectHeader('content-type', 'application/json')
+                    .returns((ctx) => {
+                        const { data } = ctx.res.json as { data: any };
+                        expect(data).toBeDefined();
+                        expect(data.deleteProducts).toBeDefined();
+                        expect(data.deleteProducts).toBeTruthy();
 
-                    return spec().post(url).withJson({
-                        query: `{
+                        return spec().post(url).withJson({
+                            query: `{
                             getProducts {
                                 _id,
                                 name
@@ -262,17 +266,16 @@ describe('Products GraphQL API', () => {
                                 }
                             }
                         }`
-                    })
-                    .returns((ctx) => {
-                        const { data } = ctx.res.json;
-                        expect(data).toBeDefined();
-                        expect(data.getProducts).toBeDefined();
-                        expect(data.getProducts.length).toBeLessThanOrEqual(initialCount - DELETE_COUNT);
-                    });
+                        })
+                            .returns((ctx) => {
+                                const { data } = ctx.res.json as { data: any };
+                                expect(data).toBeDefined();
+                                expect(data.getProducts).toBeDefined();
+                                expect(data.getProducts.length).toBeLessThanOrEqual(initialCount - DELETE_COUNT);
+                            });
 
-                })
-        
-        })
+                    })
+            })
 
     }, TEST_TIMEOUT)
 })

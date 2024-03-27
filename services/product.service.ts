@@ -133,6 +133,10 @@ export class ProductServiceMongoDbImpl implements ProductService {
 
     private async productEntryToModel(entry): Promise<Product> {
 
+        if (!entry) {
+            return null;
+        }
+        
         return {
             _id: entry._id.toString(),
             name: entry.name,

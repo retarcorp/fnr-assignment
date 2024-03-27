@@ -27,7 +27,7 @@ describe('ProductService', () => {
         const producers = client.db(process.env.DB_NAME).collection('producers');
         const result = await producers.insertOne({ name: 'Test Producer' });
         producerId = result.insertedId.toString();
-    }, 10000)
+    })
 
     afterAll(async () => {
         await client.db(process.env.DB_NAME).collection('products').deleteMany({ producerId: { $eq: new ObjectId(producerId) }});
@@ -39,7 +39,7 @@ describe('ProductService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should create a bunch of products', async () => {
+    it('should create a bunch of products and find them in all the database', async () => {
         const productService = service;
         const products = await productService.create([
             { name: 'product 1', producerId, 'vintage': 'vintage 1'},
@@ -53,7 +53,7 @@ describe('ProductService', () => {
         const fetchedProducts = await productService.getAllProducts();
         expect(fetchedProducts).toBeDefined();
         expect(fetchedProducts.length).toBeGreaterThanOrEqual(3);
-    }, 10000)
+    })
 
     it('should update a product', async () => {
         const productService = service;
@@ -80,16 +80,21 @@ describe('ProductService', () => {
             { name: 'product 3', producerId, 'vintage': 'vintage 3'}
         ]);
 
-        const dbLength = (await productService.getAllProducts()).length;
+        const fetchedById = await Promise.all(products.map(({ _id }) => productService.getById(_id)));
+        expect(fetchedById).toBeDefined();
+        expect(fetchedById.length).toBe(3);
+        expect(fetchedById.every(p => p !== null)).toBeTruthy();
+
 
         const deleted = await productService.delete(products.map(p => p._id));
         expect(deleted).toBeDefined();
         expect(deleted).toBeTruthy();
         
-        const fetchedProducts = await productService.getAllProducts();
-        expect(fetchedProducts).toBeDefined();
-        expect(fetchedProducts.length).toBe(dbLength - 3);
-    }, 10000);
+        const fetchedDeleted = await Promise.all(products.map(({ _id }) => productService.getById(_id)));
+        expect(fetchedDeleted).toBeDefined();
+        expect(fetchedDeleted.length).toBe(3);
+        expect(fetchedDeleted.every(p => p === null)).toBeTruthy();
+    });
 
     it('should get products by producer id', async () => {
 
@@ -105,5 +110,5 @@ describe('ProductService', () => {
         expect(fetchedProducts).toBeDefined();
         expect(fetchedProducts.length).toBeGreaterThanOrEqual(3);
         expect(fetchedProducts.every(p => p.producerId === producerId)).toBeTruthy();
-    }, 10000);
+    });
 });
