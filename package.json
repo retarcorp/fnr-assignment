@@ -12,11 +12,6 @@
     "sync-products": "ts-node scripts/syncProducts.ts",
     "prepare": "husky"
   },
-  "husky":{
-    "hooks": {
-      "pre-commit": "if git-branch-is master; then npm run lint && npm run test:unit; fi"
-    }
-  },
   "author": "Denis Latushkin (capt.osmant@proton.me)",
   "license": "ISC",
   "dependencies": {
@@ -41,3 +36,4 @@
     "typescript-eslint": "^7.4.0"
   }
 }
+

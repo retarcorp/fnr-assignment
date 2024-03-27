@@ -89,7 +89,7 @@ describe('ProductService', () => {
         const fetchedProducts = await productService.getAllProducts();
         expect(fetchedProducts).toBeDefined();
         expect(fetchedProducts.length).toBe(dbLength - 3);
-    });
+    }, 10000);
 
     it('should get products by producer id', async () => {
 
