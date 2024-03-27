@@ -27,7 +27,7 @@ describe('ProductService', () => {
         const producers = client.db(process.env.DB_NAME).collection('producers');
         const result = await producers.insertOne({ name: 'Test Producer' });
         producerId = result.insertedId.toString();
-    })
+    }, 10000)
 
     afterAll(async () => {
         await client.db(process.env.DB_NAME).collection('products').deleteMany({ producerId: { $eq: new ObjectId(producerId) }});
@@ -53,7 +53,7 @@ describe('ProductService', () => {
         const fetchedProducts = await productService.getAllProducts();
         expect(fetchedProducts).toBeDefined();
         expect(fetchedProducts.length).toBeGreaterThanOrEqual(3);
-    })
+    }, 10000)
 
     it('should update a product', async () => {
         const productService = service;
@@ -105,5 +105,5 @@ describe('ProductService', () => {
         expect(fetchedProducts).toBeDefined();
         expect(fetchedProducts.length).toBeGreaterThanOrEqual(3);
         expect(fetchedProducts.every(p => p.producerId === producerId)).toBeTruthy();
-    });
+    }, 10000);
 });

@@ -1,67 +1,29 @@
-# TO DO
+# FINE+RARE assignment
+* Task 1: GraphQL server for CRUD over products
+* Task 2: ETL background job and async trigger
 
-## Task 1 
-
-+ Set up github repo
-+ Install node, ts, server dep, npm init
-+ create http server and graphql endpoint
-+ encapsulate controller, service, model logic + mock implementation for CRUD requests and service method CRUD = create, read, update, delete 
-+ native parser for gql queries and mutations, map parsed operations to service methods
-+ install mongodb ORM
-+ implement model actions with orm; link service methods with ORM actions, (?) remove model class
-
-
-## Task 2
-+ Create controller and service for parser task creation, create separate service for this
-- Add state lock, optional - request queue
-+ Implement stream download and ingesting
-+ Logs and statistics
-
-
-- exceptions and error handling: http url/method, gql schema/operation, data validation
-+ Set up eslint, tslint
-+- Unit tests (jest)
-- API tests (?)
-- Postman collection - upd and put to repo
-- husky
-- docker compose with Mongo + Node runtime
-- code coverage
-- readme about how to use
-+ logs service encapsulation
-
-## To Do:
-
-+ ETL job: state lock [30]
-+ GQL API tests - ? 
-+(?) Postman collection JSON to export [5]
-+ Code coverage on test [15]
-+ log service everywhere + remove console.logs [20]
-
-+ Fix Failing Tests & Refactoring & Review [30]
-- husky on commit into main: eslint, tests [20]
-- Readme about how to install and use both tasks: install, run server, run seeds, run tests and their meaning, run ETL job [30]
-
+Application uses remote MongoDB database (within Atlas), therefore, doesn't require installation of MongoDB on a local machine. Remote connection URI will be provided with .env file separately.
 
 ## Install
-- npm install
-- request envs
-- seed db
+- Step 1: populate .env file with valid data. Values are to be requested separately from the repository. In the future can be integrated with 1password, AWS Secrets Manager, or any other secrets provider.
+- Step 2: Install dependencies: `npm install`
+- Step 3: Seed database. If you use your own database or one provided by me, it is highly recommended to run seeds. Seeds fill the database with initial data (producers, products), which makes testing process much easier and manual testing - more representative. To run seeds, trigger `npm run seed-db` command. 
 
 ## Run Server
-- npm run start
-- Postman collection
+- To start a server, run `npm run start`. GraphQL server will be available locally, on [http://localhost:3000/graphql](http://localhost:3000/graphql) address. That's it! System is set and running. 
+- To view and launch a set of available queries and mutations, you might view Postman collection, saved in this repo under `*.postman_colection.json` filename. It can be easily imported and used for manual run.
 
 ## Run ETL Job
-- npm run sync
+- For task 2, an ETL job exists in a repo. It can be triggered either by invoking `syncProducts` mutation on a running http server, or by running `npm run sync-products` command. ETL runner has a state lock, so no two sync jobs may run at the same time.
 
 ## Test
-- npm run test:unit
-- npm run test:api
+- Unit testing: `npm run test:unit`. Tests cover service's code, checking data logic and communication with database.
+- API testing: `npm run test:api`. **This test may run only when http server is running!**. These tests act as a client running graphQL queries and mutations to a server, and then validate the results with DB data.
 
 
-## Quality control
-- husky
-- eslint
-- test coverage
-- postman collection
-- api tests
+## Dev Ex
+- `husky` is running eslint check and unit tests before every commit. No breaking code is to go to repository :) 
+- `eslint` is used to take responsibility over code quality. Lint check can be ran manually via `npm run lint`
+- test coverage: unit tests launch fails if Jest detects low code coverage. 
+- postman collection: saved as an exported JSON, but can be shared among devs as well.
+- api tests: designed as a third layer of quality assurance, though now not a part of any CI pipeline. Can be ran manually to check that from client's prospective everythin is fine, in the future can be used to run e2e tests on a staging environment. Also it's much more fun to run api tests rather than test each gql query manually from Postman.
