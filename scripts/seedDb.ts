@@ -23,8 +23,8 @@ const main = async () => {
 
     await db.dropCollection('producers');
     await db.createCollection('producers');
-
     const producers = db.collection('producers');
+    await producers.deleteMany({})
 
     const prodcersData = await producers.insertMany(producersMock);
     console.log('Producers inserted:', prodcersData.insertedCount);

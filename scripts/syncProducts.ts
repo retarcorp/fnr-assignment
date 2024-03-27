@@ -3,6 +3,7 @@ import 'dotenv/config';
 import * as https from "https";
 import { MongoClient } from 'mongodb';
 import { randomUUID } from 'crypto';
+import { existsSync, readFileSync, writeFile, writeFileSync } from 'fs';
 
 
 const logger = pino({}, pino.destination('./sync/sync.log'));
@@ -55,7 +56,7 @@ const syncProductsToDb = async (products, dbClient: MongoClient) => {
 };
 
 const proceedRowsBatch = async (rows, dbClient) => {
-    
+
     const proceedBatchTask = registerAsyncTask();
 
     let products = rows.map((entry) => {
@@ -133,7 +134,7 @@ const runSync = async (dbClient: MongoClient) => {
 
         res.on("data", async (chunk) => {
             let rows = (hangingData + chunk).toString().split("\n");
-            
+
             // In case if row reading was interrupted by chunk boundary
             hangingData = rows.pop();
             data = data + rows.join("\n");
@@ -155,7 +156,7 @@ const runSync = async (dbClient: MongoClient) => {
 
         res.on("error", (err) => {
             logger.error("Error: " + err.message);
-            
+
             finishAsyncTask(syncTask);
         });
     };
@@ -166,7 +167,43 @@ const runSync = async (dbClient: MongoClient) => {
 
 };
 
+const validateStateLock = () => {
+    const lockTimeout = 60 * 1000;
+
+    try {
+        if (existsSync('./sync/lock.json')) {
+            const stateLock = JSON.parse(readFileSync('./sync/lock.json').toString());
+            if (stateLock.locked && (Date.now() - stateLock.timestamp) < lockTimeout) {
+                logger.info('Sync job is already running! Exiting process.');
+                return false;
+            }
+        }
+
+    } catch (err) {
+        logger.error('Failed to read lock state ' + err);
+        return true;
+    }
+
+    const stateLock = JSON.stringify({ locked: true, timestamp: Date.now() });
+    writeFileSync('./sync/lock.json', stateLock);
+    return true;
+}
+
+const releaseStateLock = async () => {
+    try {
+        writeFileSync('./sync/lock.json', JSON.stringify({ locked: false, timestamp: Date.now() }));
+    } catch (err) {
+        logger.error('Failed to release lock state ' + err);
+    }
+}
+
 const main = async () => {
+
+    const canContinue = validateStateLock();
+    if (!canContinue) {
+        return;
+    }
+
     const start = Date.now();
     const dbClient = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
         serverApi: {
@@ -185,6 +222,8 @@ const main = async () => {
 
         if (asyncTaskHeap.length === 0) {
             logger.info('Sync job finished in: ' + (Date.now() - start) + 'ms');
+
+            await releaseStateLock();
             await dbClient.close();
             process.exit(0);
         }

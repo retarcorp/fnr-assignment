@@ -52,4 +52,10 @@ export default class GraphQLController {
 
         return res.end();
     }
+
+    async getSchema(req: IncomingMessage, res: ServerResponse): Promise<ServerResponse> {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end(readFileSync('./schema/types.gql').toString());
+        return res;
+    }
 }

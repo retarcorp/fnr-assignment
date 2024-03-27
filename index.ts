@@ -14,13 +14,18 @@ const server = http.createServer(async (req: http.IncomingMessage, res: http.Ser
     const method = req.method as string;
     const url = req.url;
 
-    // if request method is post and url is /graphql send handling to a controller
-    if (method === 'POST' && url === '/graphql') {
+    if (url === '/graphql') {
 
-        return await controller.exec(req, res);
+        if (method === 'GET') {
+            return await controller.getSchema(req, res);
+        }
+
+        if (method === 'POST') {
+            return await controller.exec(req, res);
+        }
     }
 
-    res.writeHead(405, {'Content-Type': 'text/plain'});
+    res.writeHead(405, { 'Content-Type': 'text/plain' });
     res.end('Method and/or URL are not allowed!\n');
 });
 
@@ -33,7 +38,7 @@ server.on('listening', async () => {
             deprecationErrors: true,
         }
     });
-    
+
     await client.connect()
         .catch((err: Error) => {
             logger.fatal('Failed to connect to MongoDB', err);

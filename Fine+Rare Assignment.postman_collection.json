@@ -7,6 +7,23 @@
 	},
 	"item": [
 		{
+			"name": "Fetch Schema",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get All Products",
 			"request": {
 				"method": "POST",
@@ -39,7 +56,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "query ($id: String) {\n    getProductById(productId: $id ) {\n        _id,\n        name,\n        vintage,\n        producer {\n            name\n        } \n    }\n}",
-						"variables": "{\n    \"id\": \"6602bcf227c0797bb87b6466\"\n}"
+						"variables": "{\n    \"id\": \"6603dd4288779454cff6913d\"\n}"
 					}
 				},
 				"url": {
@@ -63,7 +80,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "query ($id: String!) {\n    getProductsByProducer(producerId: $id) {\n        _id,\n        name,\n        vintage,\n        producer {\n            name\n        } \n    }\n}",
-						"variables": "{\n    \"id\": \"6602bcf227c0797bb87b6466\"\n}"
+						"variables": "{\n    \"id\": \"6603de5665743c5c2d8723f4\"\n}"
 					}
 				},
 				"url": {
@@ -86,8 +103,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($params: [CreateProductParams]!) {\n    addProduct(params: $params) {\n        _id,\n        name,\n        producer {\n            name,\n            country,\n            region\n        }\n    }\n}",
-						"variables": "{\n    \"params\": [\n        {\n            \"vintage\": \"Vintage\",\n            \"name\": \"Product 1\",\n            \"producerId\": \"6602bcf227c0797bb87b6466\"\n        }\n    ]\n}"
+						"query": "mutation ($params: [CreateProductParams]!) {\n    addProduct(params: $params) {\n        _id,\n        name,\n        producer {\n            _id,\n            name,\n            country,\n            region\n        }\n    }\n}",
+						"variables": "{\n    \"params\": [\n        {\n            \"vintage\": \"Vintage\",\n            \"name\": \"Product 1\",\n            \"producerId\": \"6603de5665743c5c2d8723f4\"\n        }\n    ]\n}"
 					}
 				},
 				"url": {
@@ -153,8 +170,24 @@
 		{
 			"name": "Trigger Sync",
 			"request": {
-				"method": "GET",
-				"header": []
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n    syncProducts\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/graphql",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
 			},
 			"response": []
 		}
