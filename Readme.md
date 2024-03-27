@@ -33,9 +33,9 @@
 
 + ETL job: state lock [30]
 - husky on commit into main: eslint, tests [20]
-- GQL API tests - ? 
--(?) Postman collection JSON to export [5]
++ GQL API tests - ? 
++(?) Postman collection JSON to export [5]
 + Code coverage on test [15]
 - Readme about how to install and use both tasks: install, run server, run seeds, run tests and their meaning, run ETL job [30]
 - log service everywhere + remove console.logs [20]
-- Refactoring & Review [30]
+- Fix Failing Tests & Refactoring & Review [30]

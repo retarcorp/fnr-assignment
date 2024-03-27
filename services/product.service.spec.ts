@@ -27,7 +27,6 @@ describe('ProductService', () => {
         const producers = client.db(process.env.MONGODB_DB_NAME).collection('producers');
         const result = await producers.insertOne({ name: 'Test Producer' });
         producerId = result.insertedId.toString();
-        console.log('Producer ID:', producerId);
     })
 
     afterAll(async () => {

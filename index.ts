@@ -25,6 +25,7 @@ const server = http.createServer(async (req: http.IncomingMessage, res: http.Ser
         }
     }
 
+    logger.error('Method and/or URL are not allowed! ' + method + ' ' + url);
     res.writeHead(405, { 'Content-Type': 'text/plain' });
     res.end('Method and/or URL are not allowed!\n');
 });
@@ -42,6 +43,7 @@ server.on('listening', async () => {
     await client.connect()
         .catch((err: Error) => {
             logger.fatal('Failed to connect to MongoDB', err);
+            process.exit(1);
         });
 
     const service = new ProductServiceMongoDbImpl(client);
@@ -51,6 +53,7 @@ server.on('listening', async () => {
 
 server.on('close', () => {
     client.close();
+    logger.debug('Server closed');
 })
 
 server.listen(process.env.HTTP_PORT);

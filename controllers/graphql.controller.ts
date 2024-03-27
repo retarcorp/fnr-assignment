@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { GraphqlResolver, GraphqlResolverMongoServiceImpl } from '../resolvers/graphql.resolver';
 import { buildSchema, graphql } from 'graphql';
 import { readFileSync } from 'fs';
+import logger from '../utils/logger';
 
 export default class GraphQLController {
     schema: any;
@@ -13,7 +14,6 @@ export default class GraphQLController {
     }
 
     fetchBody(req: IncomingMessage): Promise<string> {
-        // Todo extract to a separate file
         return new Promise((resolve, reject) => {
             let body = '';
             req.on('data', (chunk) => {
@@ -45,7 +45,7 @@ export default class GraphQLController {
             res.end(JSON.stringify(result));
 
         } catch (e) {
-            console.error(e);
+            logger.error(e, 'Failed to execute query ');
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('Internal Server Error.\n');
         }

@@ -24,7 +24,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
 
     async getAllProducts(): Promise<Product[]> {
         const items = await this.client.db(process.env.DB_NAME).collection('products').find({}, {}).toArray();
-        return await Promise.all(items.map(item => this.productEntryToModel(item)));
+        return Promise.all(items.map(item => this.productEntryToModel(item)));
     }
 
     async getById(id: string): Promise<Product | null> {
@@ -33,31 +33,24 @@ export class ProductServiceMongoDbImpl implements ProductService {
                 $eq: new ObjectId(id)
             }
         }, {});
-        return await this.productEntryToModel(item);
+        return this.productEntryToModel(item);
     }
 
     async getByProducerId(producerId: string): Promise<Product[]> {
-        console.log(producerId);
         const items = await this.client.db(process.env.DB_NAME).collection('products').find({
             producerId: {
                 $eq: producerId
             }
         });
-        console.log({
-            producerId: {
-                $eq: producerId
-            }
-        });
         const handled = await items.toArray();
-        console.log('Items:', handled);
 
-        return await Promise.all(handled.map(item => this.productEntryToModel(item)));
+        return Promise.all(handled.map(item => this.productEntryToModel(item)));
     }
 
     async create(products: Omit<Product, '_id' | 'producer'>[]): Promise<Product[]> {
         const items = await this.client.db(process.env.DB_NAME).collection('products').insertMany(products);
         const ids = Object.values(items.insertedIds).map(id => id.toString());
-        return await Promise.all(ids.map(id => this.getById(id)));
+        return Promise.all(ids.map(id => this.getById(id)));
     }
 
     async update(_id: string, data: Partial<Product>): Promise<Product> {
@@ -76,7 +69,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
             returnDocument: 'after'
         });
 
-        return await this.getById(_id);
+        return this.getById(_id);
     }
 
     async delete(_ids: string[]): Promise<boolean> {
@@ -85,7 +78,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
                 $in: _ids.map(id => new ObjectId(id))
             }
         }).catch(e => {
-            logger.error(e);
+            logger.error(e, 'Failed to delete products!');
             return {
                 deletedCount: 0
             };
@@ -106,7 +99,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
         try {
             objectId = new ObjectId(producerId);
         } catch (e) {
-            logger.error('Unable to parse producer id. Producer ID:', producerId);
+            logger.error(e, 'Unable to parse producer id. Producer ID:' + producerId);
             return null;
         }
 
@@ -121,8 +114,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
             }, {});
 
         } catch (e) {
-            logger.error(e);
-            logger.error('Producer ID:', producerId);
+            logger.error(e, 'Unable to fetch a producer! Producer ID: ' + producerId);
             return null;
         }
 

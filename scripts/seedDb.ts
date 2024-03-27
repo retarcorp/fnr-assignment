@@ -1,6 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import * as producersMock from '../mock/producers.js';
 import 'dotenv/config'
+import logger from "../utils/logger.js";
 
 const main = async () => {
     const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
@@ -13,7 +14,8 @@ const main = async () => {
 
     await client.connect()
         .catch((err: Error) => {
-            console.error('Failed to connect to MongoDB', err);
+            logger.error(err, 'Failed to connect to MongoDB');
+            process.exit(1);
         });
 
     const db = client.db(process.env.DB_NAME);
@@ -27,7 +29,7 @@ const main = async () => {
     await producers.deleteMany({})
 
     const prodcersData = await producers.insertMany(producersMock);
-    console.log('Producers inserted:', prodcersData.insertedCount);
+    logger.info('Producers inserted:', prodcersData.insertedCount);
 
     const titles = [
         "Chateau Margaux",
@@ -65,7 +67,7 @@ const main = async () => {
     });
 
     const productsData = await products.insertMany(productsToInsert);
-    console.log('Products inserted:', productsData.insertedCount);
+    logger.info('Products inserted:', productsData.insertedCount);
 
     await client.close();
 }
