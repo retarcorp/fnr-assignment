@@ -32,10 +32,36 @@
 ## To Do:
 
 + ETL job: state lock [30]
-- husky on commit into main: eslint, tests [20]
 + GQL API tests - ? 
 +(?) Postman collection JSON to export [5]
 + Code coverage on test [15]
++ log service everywhere + remove console.logs [20]
+
++ Fix Failing Tests & Refactoring & Review [30]
+- husky on commit into main: eslint, tests [20]
 - Readme about how to install and use both tasks: install, run server, run seeds, run tests and their meaning, run ETL job [30]
-- log service everywhere + remove console.logs [20]
-- Fix Failing Tests & Refactoring & Review [30]
+
+
+## Install
+- npm install
+- request envs
+- seed db
+
+## Run Server
+- npm run start
+- Postman collection
+
+## Run ETL Job
+- npm run sync
+
+## Test
+- npm run test:unit
+- npm run test:api
+
+
+## Quality control
+- husky
+- eslint
+- test coverage
+- postman collection
+- api tests

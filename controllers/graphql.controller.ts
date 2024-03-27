@@ -1,11 +1,11 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { GraphqlResolver, GraphqlResolverMongoServiceImpl } from '../resolvers/graphql.resolver';
-import { buildSchema, graphql } from 'graphql';
+import { GraphqlResolver } from '../resolvers/graphql.resolver';
+import { GraphQLSchema, buildSchema, graphql } from 'graphql';
 import { readFileSync } from 'fs';
 import logger from '../utils/logger';
 
 export default class GraphQLController {
-    schema: any;
+    schema: GraphQLSchema;
     resolver: GraphqlResolver;
 
     constructor(resolver: GraphqlResolver) {

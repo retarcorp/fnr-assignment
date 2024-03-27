@@ -1,4 +1,4 @@
-import { ProductService, ProductServiceMongoDbImpl } from "../services/product.service";
+import { ProductService } from "../services/product.service";
 import { Product } from "../types";
 
 export interface GraphqlResolver {
@@ -41,7 +41,7 @@ export class GraphqlResolverMongoServiceImpl implements GraphqlResolver {
     async deleteProducts({ productIds }: { productIds: string[] }): Promise<boolean> {
         return this.productService.delete(productIds);
     }
-    async syncProducts(): Promise<Boolean> {
+    async syncProducts(): Promise<boolean> {
         return this.productService.startSyncJob();
     }
 }

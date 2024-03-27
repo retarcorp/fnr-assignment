@@ -24,14 +24,14 @@ describe('ProductService', () => {
     
         service = new ProductServiceMongoDbImpl(client);
 
-        const producers = client.db(process.env.MONGODB_DB_NAME).collection('producers');
+        const producers = client.db(process.env.DB_NAME).collection('producers');
         const result = await producers.insertOne({ name: 'Test Producer' });
         producerId = result.insertedId.toString();
     })
 
     afterAll(async () => {
-        await client.db(process.env.MONGODB_DB_NAME).collection('products').deleteMany({ producerId: { $eq: producerId }});
-        await client.db(process.env.MONGODB_DB_NAME).collection('producers').deleteOne({ _id: new ObjectId(producerId) });
+        await client.db(process.env.DB_NAME).collection('products').deleteMany({ producerId: { $eq: new ObjectId(producerId) }});
+        await client.db(process.env.DB_NAME).collection('producers').deleteOne({ _id: new ObjectId(producerId) });
         await client.close();
     })
 

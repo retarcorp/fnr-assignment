@@ -3,7 +3,7 @@ import 'dotenv/config';
 import * as https from "https";
 import { MongoClient } from 'mongodb';
 import { randomUUID } from 'crypto';
-import { existsSync, readFileSync, writeFile, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 
 const logger = pino({}, pino.destination('./sync/sync.log'));
@@ -59,8 +59,8 @@ const proceedRowsBatch = async (rows, dbClient) => {
 
     const proceedBatchTask = registerAsyncTask();
 
-    let products = rows.map((entry) => {
-        let columns = entry.split(",");
+    const products = rows.map((entry) => {
+        const columns = entry.split(",");
 
 
         // let parsedProducer = {
@@ -70,7 +70,7 @@ const proceedRowsBatch = async (rows, dbClient) => {
         // };
         // const producerHash = `${parsedProducer.name}-${parsedProducer.country}-${parsedProducer.region}`;
 
-        let product = {
+        const product = {
             vintage: columns[targetHeadersIndex.vintage],
             name: columns[targetHeadersIndex.name],
             producerId: 0,
@@ -99,8 +99,8 @@ const runSync = async (dbClient: MongoClient) => {
 
 
     const handleData = async (data, forceHandle = false) => {
-        let rows = data.split("\n");
-        let rowLength = rows.length;
+        const rows = data.split("\n");
+        const rowLength = rows.length;
 
         if (rowLength < 500 && forceHandle === false) {
             return data;

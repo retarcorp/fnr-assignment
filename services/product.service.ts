@@ -104,7 +104,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
         }
 
 
-        let producer: any;
+        let producer = null;
         try {
 
             producer = await this.client.db(process.env.DB_NAME).collection('producers').findOne({
@@ -118,6 +118,11 @@ export class ProductServiceMongoDbImpl implements ProductService {
             return null;
         }
 
+        if (!producer) {
+            logger.debug(`Producer with id ${producerId} not found in database. Returning null.`)
+            return null;
+        }
+
         return {
             _id: producer._id.toString(),
             name: producer.name,
@@ -126,7 +131,7 @@ export class ProductServiceMongoDbImpl implements ProductService {
         };
     }
 
-    private async productEntryToModel(entry: any): Promise<Product> {
+    private async productEntryToModel(entry): Promise<Product> {
 
         return {
             _id: entry._id.toString(),

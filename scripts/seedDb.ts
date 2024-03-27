@@ -1,7 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import * as producersMock from '../mock/producers.js';
 import 'dotenv/config'
-import logger from "../utils/logger.js";
+import logger from "../utils/logger";
 
 const main = async () => {
     const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
@@ -29,7 +29,7 @@ const main = async () => {
     await producers.deleteMany({})
 
     const prodcersData = await producers.insertMany(producersMock);
-    logger.info('Producers inserted:', prodcersData.insertedCount);
+    logger.info('Producers inserted: ' + prodcersData.insertedCount);
 
     const titles = [
         "Chateau Margaux",
@@ -67,7 +67,7 @@ const main = async () => {
     });
 
     const productsData = await products.insertMany(productsToInsert);
-    logger.info('Products inserted:', productsData.insertedCount);
+    logger.info('Products inserted: ' + productsData.insertedCount);
 
     await client.close();
 }

@@ -1,7 +1,7 @@
-const { spec } = require('pactum');
-import { spawn, spawnSync } from 'child_process';
+import { spec } from 'pactum';
+import { spawnSync } from 'child_process';
 import 'dotenv/config';
-import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 describe('Products GraphQL API', () => {
 

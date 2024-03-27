@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = [
     {"name": "Vineyard Ventures", "country": "France", "region": "Bordeaux"},
     {"name": "Mountain Majesty Winery", "country": "USA", "region": "California"},
