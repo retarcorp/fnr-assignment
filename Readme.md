@@ -1,4 +1,4 @@
-# FINE+RARE assignment
+# F+R assignment
 * Task 1: GraphQL server for CRUD over products
 * Task 2: ETL background job and async trigger
 
